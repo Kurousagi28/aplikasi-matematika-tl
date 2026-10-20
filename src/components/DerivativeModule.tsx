@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import KTeX from './KTeX';
 import CoordinateCanvas, { CanvasConfig, toSX, toSY } from './CoordinateCanvas';
+import { InfoTooltip } from './Tooltip';
 import { sound } from '../utils/audio';
 
 /* =============================================================
@@ -323,7 +324,7 @@ export const DerivativeModule: React.FC<DerivativeModuleProps> = ({ onNavigateNe
           <div className="card-header">
             <div className="card-icon cyan">𝑓'</div>
             <div>
-              <div className="card-title">Pilih Fungsi Kurva</div>
+              <div className="card-title">Pilih Fungsi Kurva <InfoTooltip text="Pilih fungsi dari dropdown untuk mengeksplorasi garis singgung, garis normal, dan kecekungan. Tersedia polinomial, trigonometri, dan bentuk akar." /></div>
               <div className="card-subtitle">Polinomial, Trigonometri, Bentuk Akar</div>
             </div>
           </div>
@@ -350,7 +351,7 @@ export const DerivativeModule: React.FC<DerivativeModuleProps> = ({ onNavigateNe
         <div className="card">
           <div className="card-header">
             <div className="card-icon violet">📐</div>
-            <div className="card-title">Rumus Turunan Pertama & Kedua</div>
+            <div className="card-title">Rumus Turunan Pertama & Kedua <InfoTooltip text="Menampilkan rumus f(x), f'(x), dan f''(x). Turunan pertama menentukan gradien singgung, turunan kedua menentukan kecekungan kurva." /></div>
           </div>
           <div className="formula-display" style={{ textAlign: 'center', padding: '12px' }}>
             <KTeX math={fn.latex} display />
@@ -369,7 +370,7 @@ export const DerivativeModule: React.FC<DerivativeModuleProps> = ({ onNavigateNe
         <div className="card">
           <div className="card-header">
             <div className="card-icon emerald">👁</div>
-            <div className="card-title">Instrumen Visualisasi</div>
+            <div className="card-title">Instrumen Visualisasi <InfoTooltip text="Pilih mode tampilan: Garis Singgung (tangent) menunjukkan kemiringan sesaat, atau Garis Sekan (secant) untuk melihat transisi h→0. Aktifkan overlay garis normal dan kurva turunan untuk analisis lebih dalam." /></div>
           </div>
           <div className="tab-nav" style={{ width: '100%', marginBottom: '12px' }}>
             <button
@@ -458,7 +459,7 @@ export const DerivativeModule: React.FC<DerivativeModuleProps> = ({ onNavigateNe
         <div className="card">
           <div className="card-header">
             <div className="card-icon amber">🎯</div>
-            <div className="card-title">Posisi Titik Kontak P(x₀, y₀)</div>
+            <div className="card-title">Posisi Titik Kontak P(x₀, y₀) <InfoTooltip text="Geser slider untuk memindahkan titik kontak P sepanjang kurva. Anda juga bisa KLIK LANGSUNG di grafik untuk memindahkan titik — persamaan garis singgung dan normal akan terupdate secara real-time." /></div>
           </div>
           <div className="slider-group">
             <div className="slider-label">
@@ -604,7 +605,7 @@ export const DerivativeModule: React.FC<DerivativeModuleProps> = ({ onNavigateNe
           )}
         </div>
 
-        <CoordinateCanvas config={config}>
+        <CoordinateCanvas config={config} evalFn={fn.f}>
           {/* Invisible click overlay */}
           <rect
             x={0}

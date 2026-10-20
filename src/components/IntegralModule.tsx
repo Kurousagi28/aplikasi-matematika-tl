@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import KTeX from './KTeX';
 import CoordinateCanvas, { CanvasConfig, toSX, toSY } from './CoordinateCanvas';
+import { InfoTooltip } from './Tooltip';
 import { sound } from '../utils/audio';
 
 /* =============================================================
@@ -422,7 +423,7 @@ export const IntegralModule: React.FC<IntegralModuleProps> = ({ onNavigateNext }
           <div className="card-header">
             <div className="card-icon cyan">∫</div>
             <div>
-              <div className="card-title">Pilih Mode Eksplorasi</div>
+              <div className="card-title">Pilih Mode Eksplorasi <InfoTooltip text="Dua mode tersedia: (1) Jumlah Riemann untuk melihat bagaimana integral dihitung dari penjumlahan balok, (2) Luas Antara 2 Kurva untuk menghitung area di antara dua fungsi." /></div>
               <div className="card-subtitle">Jumlah Riemann vs Luas Antara Dua Kurva</div>
             </div>
           </div>
@@ -492,7 +493,7 @@ export const IntegralModule: React.FC<IntegralModuleProps> = ({ onNavigateNext }
             <div className="card">
               <div className="card-header">
                 <div className="card-icon amber">🔢</div>
-                <div className="card-title">Tipe Titik Sampel Riemann</div>
+                <div className="card-title">Tipe Titik Sampel Riemann <InfoTooltip text="Pilih cara menentukan tinggi setiap balok partisi. Kiri: tinggi dari ujung kiri. Kanan: dari ujung kanan. Tengah: dari titik tengah (paling akurat). Trapesium: rata-rata kiri dan kanan." /></div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
                 {(Object.entries(sumTypeLabels) as [SumType, string][]).map(([key, label]) => (
@@ -515,7 +516,7 @@ export const IntegralModule: React.FC<IntegralModuleProps> = ({ onNavigateNext }
             <div className="card">
               <div className="card-header">
                 <div className="card-icon cyan">📊</div>
-                <div className="card-title">Jumlah Partisi Subinterval (n)</div>
+                <div className="card-title">Jumlah Partisi Subinterval (n) <InfoTooltip text="Atur jumlah balok yang membagi interval [a,b]. Semakin besar n, semakin akurat pendekatan Riemann terhadap nilai integral eksak. Klik tombol-tombol cepat atau jalankan animasi konvergensi!" /></div>
               </div>
               <div className="slider-group">
                 <div className="slider-label">
@@ -563,7 +564,7 @@ export const IntegralModule: React.FC<IntegralModuleProps> = ({ onNavigateNext }
             <div className="card">
               <div className="card-header">
                 <div className="card-icon rose">📏</div>
-                <div className="card-title">Batas Interval Integrasi [a, b]</div>
+                <div className="card-title">Batas Interval Integrasi [a, b] <InfoTooltip text="Atur batas bawah (a) dan batas atas (b) integrasi. Balok-balok Riemann dan perhitungan luas hanya dihitung dalam interval ini." /></div>
               </div>
               <div className="info-grid">
                 <div className="slider-group">
@@ -790,7 +791,7 @@ export const IntegralModule: React.FC<IntegralModuleProps> = ({ onNavigateNext }
         </div>
 
         {mode === 'riemann' ? (
-          <CoordinateCanvas config={configSingle}>
+          <CoordinateCanvas config={configSingle} evalFn={fn.f}>
             {/* Riemann Rectangles */}
             {rects.map((r, i) => (
               <path key={i} d={r.path} fill={r.fill} stroke={r.stroke} strokeWidth="1" />

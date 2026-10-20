@@ -4,11 +4,19 @@ import DerivativeModule from './components/DerivativeModule';
 import IntegralModule from './components/IntegralModule';
 import QuizModule from './components/QuizModule';
 import FormulaModal from './components/FormulaModal';
+import Chatbot from './components/Chatbot';
+import FeatureGuide from './components/FeatureGuide';
 import { sound } from './utils/audio';
 
 /* =============================================================
    ANTIGRAVITY — Main Application Shell
    Platform Bahan Ajar Matematika Tingkat Lanjut (SMA TL)
+   
+   ENHANCEMENTS v2.1:
+   - Chatbot AI Asisten Matematika
+   - Panduan Fitur konteks-aware
+   - Progress tracker antar modul
+   - Welcome onboarding
    ============================================================= */
 
 type Page = 'home' | 'limit' | 'derivative' | 'integral' | 'quiz';
@@ -48,6 +56,43 @@ const Particles: React.FC = () => {
   );
 };
 
+// Progress Tracker Component
+const ProgressTracker: React.FC<{ currentPage: Page }> = ({ currentPage }) => {
+  const steps: { id: Page; label: string; icon: string }[] = [
+    { id: 'limit', label: 'Limit', icon: '∞' },
+    { id: 'derivative', label: 'Turunan', icon: "𝑓'" },
+    { id: 'integral', label: 'Integral', icon: '∫' },
+    { id: 'quiz', label: 'Kuis', icon: '🎯' },
+  ];
+
+  const currentIdx = steps.findIndex((s) => s.id === currentPage);
+
+  if (currentPage === 'home') return null;
+
+  return (
+    <div className="progress-tracker">
+      {steps.map((step, idx) => {
+        const isActive = step.id === currentPage;
+        const isCompleted = idx < currentIdx;
+        return (
+          <React.Fragment key={step.id}>
+            <div
+              className={`progress-step ${isActive ? 'progress-active' : ''} ${isCompleted ? 'progress-completed' : ''}`}
+              title={step.label}
+            >
+              <div className="progress-step-icon">{step.icon}</div>
+              <div className="progress-step-label">{step.label}</div>
+            </div>
+            {idx < steps.length - 1 && (
+              <div className={`progress-connector ${idx < currentIdx ? 'connector-completed' : ''}`} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [page, setPage] = useState<Page>('home');
   const [isFormulaOpen, setIsFormulaOpen] = useState(false);
@@ -75,15 +120,17 @@ const App: React.FC = () => {
       subtitle: 'Aljabar, Trigonometri, & Asimtot Tak Hingga',
       desc: 'Visualisasikan konvergensi kiri-kanan, titik berlubang (hole), asimtot ketakhinggaan, dan kasus ketika limit tidak terdefinisi secara interaktif.',
       topics: ['Limit Aljabar & Akar', 'sin(x)/x & Trig Khusus', 'Limit Tak Hingga (x→∞)', 'Limit Tidak Ada', 'Pita Epsilon-Delta'],
+      featureHighlight: '🖱️ Hover grafik untuk lihat koordinat',
     },
     {
       id: 'derivative' as Page,
-      icon: '𝑓\'',
+      icon: "𝑓'",
       iconBg: 'linear-gradient(135deg, #a78bfa, #8b5cf6)',
       title: 'Turunan (Diferensial)',
       subtitle: 'Garis Singgung, Garis Normal, & Kecekungan',
-      desc: 'Eksplorasi transisi garis sekan ke garis singgung (h→0), kurva turunan f\'(x), garis normal tegak lurus, serta uji kecekungan turunan kedua f\'\'(x).',
-      topics: ['Garis Singgung & Normal', 'Transisi Sekan h→0', 'Overlay Kurva f\'(x)', 'Uji f\'\'(x) & Kecekungan', 'Titik Stasioner & Belok'],
+      desc: "Eksplorasi transisi garis sekan ke garis singgung (h→0), kurva turunan f'(x), garis normal tegak lurus, serta uji kecekungan turunan kedua f''(x).",
+      topics: ['Garis Singgung & Normal', 'Transisi Sekan h→0', "Overlay Kurva f'(x)", "Uji f''(x) & Kecekungan", 'Titik Stasioner & Belok'],
+      featureHighlight: '🖱️ Klik langsung di grafik untuk geser titik',
     },
     {
       id: 'integral' as Page,
@@ -93,6 +140,7 @@ const App: React.FC = () => {
       subtitle: 'Jumlah Riemann & Luas Antara 2 Kurva',
       desc: 'Pelajari akumulasi luas kurva melalui Jumlah Riemann (n partisi) dan visualisasikan langsung perhitungan luas tertutup di antara dua kurva berpotongan.',
       topics: ['Jumlah Riemann (Left/Right/Mid)', 'Konvergensi n→∞', 'Teorema Dasar Kalkulus', 'Luas Antara Dua Kurva', 'Luas Netto vs Geometris'],
+      featureHighlight: '▶️ Jalankan animasi konvergensi otomatis',
     },
     {
       id: 'quiz' as Page,
@@ -102,6 +150,7 @@ const App: React.FC = () => {
       subtitle: '24 Soal Selektif Standar Ujian TL & UTBK',
       desc: 'Uji penguasaan konsep kalkulus Anda dengan 24 soal komprehensif, mode ujian berwaktu (timer), skor streak, dan pembahasan langkah demi langkah KaTeX.',
       topics: ['24 Soal Terpilih', 'Mode Timer Ujian', 'Pembahasan KaTeX Lengkap', 'Koneksi Simulasi Visual', 'Skor & Streak Rekor'],
+      featureHighlight: '💬 Tanya chatbot jika bingung',
     },
   ];
 
@@ -111,6 +160,12 @@ const App: React.FC = () => {
 
       {/* ── Formula Modal ── */}
       <FormulaModal isOpen={isFormulaOpen} onClose={() => setIsFormulaOpen(false)} />
+
+      {/* ── Chatbot AI Asisten ── */}
+      <Chatbot activeModule={page} />
+
+      {/* ── Feature Guide ── */}
+      <FeatureGuide activeModule={page} />
 
       {/* ── Navbar ── */}
       <nav className="navbar">
@@ -177,11 +232,14 @@ const App: React.FC = () => {
 
             <div className="status-badge hide-on-mobile">
               <span className="status-dot" />
-              Engine V2.0
+              Engine V2.1
             </div>
           </div>
         </div>
       </nav>
+
+      {/* ── Progress Tracker ── */}
+      <ProgressTracker currentPage={page} />
 
       {/* ── Page Content ── */}
       <div className="app-container">
@@ -195,6 +253,20 @@ const App: React.FC = () => {
                 <strong> Limit</strong>, <strong>Turunan</strong>, dan <strong>Integral</strong> melalui
                 visualisasi geometris real-time tanpa rumus membosankan.
               </p>
+              <div className="hero-features">
+                <div className="hero-feature-item">
+                  <span className="hero-feature-icon">🖱️</span>
+                  <span>Hover grafik untuk lihat koordinat</span>
+                </div>
+                <div className="hero-feature-item">
+                  <span className="hero-feature-icon">💬</span>
+                  <span>Chatbot asisten siap menjawab</span>
+                </div>
+                <div className="hero-feature-item">
+                  <span className="hero-feature-icon">ℹ️</span>
+                  <span>Panduan fitur di setiap halaman</span>
+                </div>
+              </div>
               <div className="btn-group" style={{ justifyContent: 'center' }}>
                 <button
                   className="btn btn-primary"
@@ -242,6 +314,10 @@ const App: React.FC = () => {
                     {mod.subtitle}
                   </div>
                   <p>{mod.desc}</p>
+                  {/* Feature Highlight Badge */}
+                  <div className="module-card-highlight">
+                    {mod.featureHighlight}
+                  </div>
                   <div className="module-topics">
                     {mod.topics.map((topic) => (
                       <span key={topic} className="topic-tag">{topic}</span>

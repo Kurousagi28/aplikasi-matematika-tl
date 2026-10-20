@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import KTeX from './KTeX';
 import CoordinateCanvas, { CanvasConfig, toSX, toSY } from './CoordinateCanvas';
+import { InfoTooltip } from './Tooltip';
 import { sound } from '../utils/audio';
 
 /* =============================================================
@@ -341,7 +342,7 @@ export const LimitModule: React.FC<LimitModuleProps> = ({ onNavigateNext }) => {
           <div className="card-header">
             <div className="card-icon cyan">∞</div>
             <div>
-              <div className="card-title">Pilih Kasus Limit</div>
+              <div className="card-title">Pilih Kasus Limit <InfoTooltip text="Pilih fungsi matematika dari dropdown untuk mengeksplorasi berbagai tipe limit. Ada 4 kategori: aljabar, trigonometri, limit tidak ada, dan limit di ketakhinggaan." /></div>
               <div className="card-subtitle">Aljabar, Trigonometri, Asimtot, & Kasus Khusus</div>
             </div>
           </div>
@@ -387,7 +388,7 @@ export const LimitModule: React.FC<LimitModuleProps> = ({ onNavigateNext }) => {
         <div className="card">
           <div className="card-header">
             <div className="card-icon violet">𝑓</div>
-            <div className="card-title">Definisi Fungsi & Nilai Limit</div>
+            <div className="card-title">Definisi Fungsi & Nilai Limit <InfoTooltip text="Menampilkan rumus matematika fungsi f(x) beserta nilai limitnya. Jika bentuk tak tentu 0/0, perlu teknik khusus untuk menyelesaikan." /></div>
           </div>
           <div className="formula-display" style={{ textAlign: 'center', padding: '14px' }}>
             <KTeX math={fn.latex} display />
@@ -436,6 +437,7 @@ export const LimitModule: React.FC<LimitModuleProps> = ({ onNavigateNext }) => {
             <div className="card-icon amber">🎯</div>
             <div className="card-title">
               {isInf ? 'Nilai x Menuju Tak Hingga' : `Kontrol Pendekatan ke Titik x = ${s}`}
+              <InfoTooltip text={isInf ? 'Geser slider untuk memperbesar nilai x menuju tak hingga. Amati kurva mendekati garis asimtot horizontal.' : `Geser slider untuk mendekatkan probe ke titik x = ${s}. Semakin kecil jarak, semakin jelas konvergensi nilai f(x) ke limit L.`} />
             </div>
           </div>
 
@@ -536,7 +538,7 @@ export const LimitModule: React.FC<LimitModuleProps> = ({ onNavigateNext }) => {
             <div className="card-header" style={{ marginBottom: '8px' }}>
               <div className="card-icon rose">📏</div>
               <div style={{ flex: 1 }}>
-                <div className="card-title">Pita Presisi Epsilon-Delta (ε-δ)</div>
+                <div className="card-title">Pita Presisi Epsilon-Delta (ε-δ) <InfoTooltip text="Definisi formal limit: untuk setiap ε > 0 (toleransi vertikal), terdapat δ > 0 (toleransi horizontal) sehingga jika |x - c| < δ maka |f(x) - L| < ε. Aktifkan checkbox untuk melihat pita visualnya!" /></div>
                 <div className="card-subtitle">Visualisasi formal definisi kalkulus lanjut</div>
               </div>
               <input
@@ -711,7 +713,7 @@ export const LimitModule: React.FC<LimitModuleProps> = ({ onNavigateNext }) => {
           )}
         </div>
 
-        <CoordinateCanvas config={config}>
+        <CoordinateCanvas config={config} evalFn={fn.f}>
           {/* Epsilon band (horizontal region L ± epsilon) */}
           {showEpsilonDelta && fn.limitValue !== null && (
             <rect
