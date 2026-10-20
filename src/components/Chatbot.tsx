@@ -230,6 +230,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({ activeModule }) => {
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
   const msgIdRef = useRef(0);
 
   // Update suggestions when module changes
@@ -249,12 +251,25 @@ export const Chatbot: React.FC<ChatbotProps> = ({ activeModule }) => {
     }
   }, [isOpen]);
 
-  const toggleChat = () => {
-    sound.playPop(isOpen ? 350 : 520);
-    setIsOpen(!isOpen);
+  const closeChat = useCallback((e?: React.MouseEvent | React.KeyboardEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    sound.playPop(350);
+    setIsOpen(false);
+  }, []);
+
+  const openChat = useCallback((e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    sound.playPop(520);
+    setIsOpen(true);
 
     // Show welcome message on first open
-    if (!isOpen && messages.length === 0) {
+    if (messages.length === 0) {
       const moduleNames: Record<ActiveModule, string> = {
         home: 'halaman utama',
         limit: 'Modul Limit',
@@ -270,7 +285,50 @@ export const Chatbot: React.FC<ChatbotProps> = ({ activeModule }) => {
       };
       setMessages([welcomeMsg]);
     }
-  };
+  }, [activeModule, messages.length]);
+
+  const toggleChat = useCallback((e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (isOpen) {
+      closeChat(e);
+    } else {
+      openChat(e);
+    }
+  }, [isOpen, closeChat, openChat]);
+
+  // Close on outside click and Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        chatWindowRef.current &&
+        !chatWindowRef.current.contains(target) &&
+        fabRef.current &&
+        !fabRef.current.contains(target)
+      ) {
+        closeChat();
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeChat();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, closeChat]);
 
   const sendMessage = useCallback((text: string) => {
     if (!text.trim()) return;
@@ -334,115 +392,130 @@ export const Chatbot: React.FC<ChatbotProps> = ({ activeModule }) => {
   };
 
   return (
-    <div className="chatbot-root">
-      {/* ── Chat Window (Only visible when opened) ── */}
+    <>
+      {/* ── Backdrop for Mobile (Tapping outside closes chat) ── */}
       {isOpen && (
-        <div className="chatbot-window">
-          {/* Header */}
-          <div className="chatbot-header">
-            <div className="chatbot-header-info">
-              <div className="chatbot-avatar">🤖</div>
-              <div>
-                <div className="chatbot-title">Asisten Matematika</div>
-                <div className="chatbot-status">
-                  <span className="chatbot-status-dot" />
-                  Online
-                </div>
-              </div>
-            </div>
-            <button
-              className="chatbot-close-btn"
-              onClick={toggleChat}
-              aria-label="Tutup Chat"
-              title="Tutup Obrolan"
-            >
-              ✕
-            </button>
-          </div>
+        <div
+          className="chatbot-backdrop"
+          onClick={closeChat}
+          aria-hidden="true"
+        />
+      )}
 
-          {/* Messages */}
-          <div className="chatbot-messages">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`chatbot-msg ${msg.role === 'user' ? 'chatbot-msg-user' : 'chatbot-msg-bot'}`}
-              >
-                {msg.role === 'bot' && <div className="chatbot-msg-avatar">🤖</div>}
-                <div className={`chatbot-msg-bubble ${msg.role === 'user' ? 'chatbot-bubble-user' : 'chatbot-bubble-bot'}`}>
-                  {formatText(msg.text)}
-                  <div className="chatbot-msg-time">
-                    {msg.timestamp.toLocaleTimeString('id-ID', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+      <div className="chatbot-root">
+        {/* ── Chat Window (Only visible when opened) ── */}
+        {isOpen && (
+          <div ref={chatWindowRef} className="chatbot-window">
+            {/* Header */}
+            <div className="chatbot-header">
+              <div className="chatbot-header-info">
+                <div className="chatbot-avatar">🤖</div>
+                <div>
+                  <div className="chatbot-title">Asisten Matematika</div>
+                  <div className="chatbot-status">
+                    <span className="chatbot-status-dot" />
+                    Online
                   </div>
                 </div>
               </div>
-            ))}
+              <button
+                type="button"
+                className="chatbot-close-btn"
+                onClick={closeChat}
+                aria-label="Tutup Chat"
+                title="Tutup Obrolan (Esc)"
+              >
+                ✕
+              </button>
+            </div>
 
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="chatbot-msg chatbot-msg-bot">
-                <div className="chatbot-msg-avatar">🤖</div>
-                <div className="chatbot-bubble-bot chatbot-typing">
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
+            {/* Messages */}
+            <div className="chatbot-messages">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`chatbot-msg ${msg.role === 'user' ? 'chatbot-msg-user' : 'chatbot-msg-bot'}`}
+                >
+                  {msg.role === 'bot' && <div className="chatbot-msg-avatar">🤖</div>}
+                  <div className={`chatbot-msg-bubble ${msg.role === 'user' ? 'chatbot-bubble-user' : 'chatbot-bubble-bot'}`}>
+                    {formatText(msg.text)}
+                    <div className="chatbot-msg-time">
+                      {msg.timestamp.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </div>
+                  </div>
                 </div>
+              ))}
+
+              {/* Typing indicator */}
+              {isTyping && (
+                <div className="chatbot-msg chatbot-msg-bot">
+                  <div className="chatbot-msg-avatar">🤖</div>
+                  <div className="chatbot-bubble-bot chatbot-typing">
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Quick Reply Suggestions */}
+            {currentFollowUp.length > 0 && (
+              <div className="chatbot-suggestions">
+                {currentFollowUp.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    className="chatbot-suggestion-btn"
+                    onClick={() => handleQuickReply(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
               </div>
             )}
 
-            <div ref={messagesEndRef} />
+            {/* Input */}
+            <form className="chatbot-input-area" onSubmit={handleSubmit}>
+              <input
+                ref={inputRef}
+                type="text"
+                className="chatbot-input"
+                placeholder="Tanya seputar Limit, Turunan, Integral..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="chatbot-send-btn"
+                disabled={!inputValue.trim()}
+                aria-label="Kirim"
+              >
+                ➤
+              </button>
+            </form>
           </div>
+        )}
 
-          {/* Quick Reply Suggestions */}
-          {currentFollowUp.length > 0 && (
-            <div className="chatbot-suggestions">
-              {currentFollowUp.map((suggestion) => (
-                <button
-                  key={suggestion}
-                  className="chatbot-suggestion-btn"
-                  onClick={() => handleQuickReply(suggestion)}
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Input */}
-          <form className="chatbot-input-area" onSubmit={handleSubmit}>
-            <input
-              ref={inputRef}
-              type="text"
-              className="chatbot-input"
-              placeholder="Tanya seputar Limit, Turunan, Integral..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="chatbot-send-btn"
-              disabled={!inputValue.trim()}
-              aria-label="Kirim"
-            >
-              ➤
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* ── Floating Toggle Button ── */}
-      <button
-        className={`chatbot-fab ${isOpen ? 'chatbot-fab-active' : ''}`}
-        onClick={toggleChat}
-        aria-label={isOpen ? 'Tutup Chat' : 'Buka Chatbot Asisten'}
-        title="Tanya Asisten Matematika"
-      >
-        <span className="chatbot-fab-icon">{isOpen ? '✕' : '💬'}</span>
-        {!isOpen && <span className="chatbot-fab-label">Tanya AI</span>}
-      </button>
-    </div>
+        {/* ── Floating Toggle Button ── */}
+        <button
+          ref={fabRef}
+          type="button"
+          className={`chatbot-fab ${isOpen ? 'chatbot-fab-active' : ''}`}
+          onClick={toggleChat}
+          aria-label={isOpen ? 'Tutup Chat' : 'Buka Chatbot Asisten'}
+          title={isOpen ? 'Tutup Obrolan' : 'Tanya Asisten Matematika'}
+        >
+          <span className="chatbot-fab-icon">{isOpen ? '✕' : '💬'}</span>
+          {!isOpen && <span className="chatbot-fab-label">Tanya AI</span>}
+        </button>
+      </div>
+    </>
   );
 };
 

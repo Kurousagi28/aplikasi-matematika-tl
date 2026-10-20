@@ -2335,23 +2335,27 @@ input[type="range"].slider-violet::-webkit-slider-thumb {
 }
 
 .chatbot-close-btn {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
+  font-weight: 700;
   transition: all var(--transition-fast);
+  z-index: 10;
 }
 
 .chatbot-close-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  background: rgba(251, 113, 133, 0.2);
+  border-color: var(--accent-rose);
+  color: var(--accent-rose);
+  transform: scale(1.05);
 }
 
 /* Messages Area */
@@ -2546,8 +2550,21 @@ input[type="range"].slider-violet::-webkit-slider-thumb {
   transform: scale(1.08);
 }
 
+/* Chatbot Backdrop */
+.chatbot-backdrop {
+  display: none;
+}
+
 /* Mobile Responsive */
 @media (max-width: 640px) {
+  .chatbot-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+  }
   .chatbot-root {
     bottom: 16px;
     right: 16px;
