@@ -605,7 +605,7 @@ export const DerivativeModule: React.FC<DerivativeModuleProps> = ({ onNavigateNe
           )}
         </div>
 
-        <CoordinateCanvas config={config} evalFn={fn.f}>
+        <CoordinateCanvas config={config} evalFn={fn.f} title="Grafik Turunan & Garis Singgung">
           {/* Invisible click overlay */}
           <rect
             x={0}

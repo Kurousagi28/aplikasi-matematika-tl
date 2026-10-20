@@ -791,7 +791,7 @@ export const IntegralModule: React.FC<IntegralModuleProps> = ({ onNavigateNext }
         </div>
 
         {mode === 'riemann' ? (
-          <CoordinateCanvas config={configSingle} evalFn={fn.f}>
+          <CoordinateCanvas config={configSingle} evalFn={fn.f} title="Grafik Jumlah Riemann & Luas">
             {/* Riemann Rectangles */}
             {rects.map((r, i) => (
               <path key={i} d={r.path} fill={r.fill} stroke={r.stroke} strokeWidth="1" />
@@ -840,7 +840,7 @@ export const IntegralModule: React.FC<IntegralModuleProps> = ({ onNavigateNext }
             )}
           </CoordinateCanvas>
         ) : (
-          <CoordinateCanvas config={configTwoCurves}>
+          <CoordinateCanvas config={configTwoCurves} title="Grafik Luas Antara 2 Kurva">
             {/* Shaded Area between curves */}
             <path
               d={twoCurvesShadedArea}

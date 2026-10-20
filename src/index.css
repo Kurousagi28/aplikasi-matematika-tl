@@ -613,15 +613,18 @@ input[type="range"].slider-violet::-webkit-slider-thumb {
   top: 80px;
   height: calc(100vh - 120px);
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(34, 211, 238, 0.05);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .canvas-panel:hover {
-  border-color: var(--border-default);
+  border-color: rgba(34, 211, 238, 0.35);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 25px rgba(34, 211, 238, 0.1);
 }
 
 @media (max-width: 1024px) {
@@ -633,22 +636,114 @@ input[type="range"].slider-violet::-webkit-slider-thumb {
   }
 }
 
+/* Canvas Container Root */
+.canvas-container-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Canvas Header Bar with Controls */
+.canvas-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 14px;
+  background: rgba(9, 16, 36, 0.96);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 20;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.canvas-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.canvas-header-icon {
+  font-size: 13px;
+}
+
+.canvas-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.canvas-ctrl-btn {
+  height: 24px;
+  min-width: 24px;
+  padding: 0 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.canvas-ctrl-btn:hover:not(:disabled) {
+  background: var(--accent-cyan-dim);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+.canvas-ctrl-btn.active {
+  background: var(--accent-cyan-dim);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+.canvas-ctrl-btn.canvas-ctrl-reset {
+  font-size: 10px;
+  color: var(--accent-amber);
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(251, 191, 36, 0.06);
+}
+
+.canvas-ctrl-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Canvas HUD (Heads-Up Display) */
 .canvas-hud {
   position: absolute;
-  top: var(--space-4);
-  left: var(--space-4);
-  background: rgba(5, 10, 24, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border-subtle);
+  top: 48px;
+  left: 14px;
+  background: rgba(8, 14, 32, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  padding: var(--space-3);
+  padding: 10px 14px;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--text-secondary);
   z-index: 10;
   pointer-events: none;
-  min-width: 160px;
+  min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 .canvas-hud-row {
@@ -699,6 +794,7 @@ input[type="range"].slider-violet::-webkit-slider-thumb {
   flex: 1;
   width: 100%;
   height: 100%;
+  display: block;
 }
 
 /* ---- Mission Card (Active Learning) ---- */

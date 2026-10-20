@@ -713,7 +713,7 @@ export const LimitModule: React.FC<LimitModuleProps> = ({ onNavigateNext }) => {
           )}
         </div>
 
-        <CoordinateCanvas config={config} evalFn={fn.f}>
+        <CoordinateCanvas config={config} evalFn={fn.f} title="Grafik Konvergensi Limit">
           {/* Epsilon band (horizontal region L ± epsilon) */}
           {showEpsilonDelta && fn.limitValue !== null && (
             <rect
