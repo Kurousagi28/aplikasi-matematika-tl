@@ -161,12 +161,6 @@ const App: React.FC = () => {
       {/* ── Formula Modal ── */}
       <FormulaModal isOpen={isFormulaOpen} onClose={() => setIsFormulaOpen(false)} />
 
-      {/* ── Chatbot AI Asisten ── */}
-      <Chatbot activeModule={page} />
-
-      {/* ── Feature Guide ── */}
-      <FeatureGuide activeModule={page} />
-
       {/* ── Navbar ── */}
       <nav className="navbar">
         <div className="navbar-inner">
@@ -348,6 +342,12 @@ const App: React.FC = () => {
           <QuizModule onNavigateModule={(m) => navigateTo(m)} />
         )}
       </div>
+
+      {/* ── Feature Guide (Bottom-Left) ── */}
+      <FeatureGuide activeModule={page} />
+
+      {/* ── Chatbot AI Asisten (Bottom-Right) ── */}
+      <Chatbot activeModule={page} />
     </>
   );
 };
